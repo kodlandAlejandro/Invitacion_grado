@@ -3,118 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Invitación de Grado - Alejandro</title>
+    <title>Invitación Alejandro</title>
     <style>
-        :root {
-            --dorado: #d4af37;
-            --negro: #1a1a1a;
-        }
-
-        /* Configuración para que ocupe toda la pantalla del cel sin scroll */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
+        :root { --dorado: #d4af37; --negro: #1a1a1a; }
+        * { box-sizing: border-box; }
+        
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
             background-color: var(--negro);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100vw;
+            font-family: sans-serif;
+            overflow-x: hidden; /* Permite scroll vertical si la imagen es grande */
         }
 
         #contenedor-principal {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
             text-align: center;
-            width: 90%;
-            max-width: 450px;
-            z-index: 1;
+            padding: 20px;
         }
 
-        /* Inputs y Botones */
         input {
-            padding: 15px;
-            border-radius: 10px;
-            border: 2px solid var(--dorado);
-            background: #2a2a2a;
-            color: white;
-            font-size: 1rem;
-            width: 80%;
-            margin-bottom: 20px;
-            text-align: center;
+            width: 80%; padding: 15px; margin-bottom: 20px;
+            border-radius: 8px; border: 2px solid var(--dorado);
+            background: #222; color: white; font-size: 16px;
         }
 
-        .btn-dorado {
-            padding: 15px 30px;
-            border-radius: 10px;
-            border: none;
-            background-color: var(--dorado);
-            color: black;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
+        .btn {
+            background-color: var(--dorado); color: black;
+            border: none; padding: 15px 30px;
+            font-weight: bold; border-radius: 8px;
+            font-size: 18px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: inline-block;
         }
 
-        /* Pantallas */
-        #pantalla-invitacion {
-            display: none;
-        }
+        #pantalla-invitacion { display: none; }
 
         .img-invitacion {
             width: 100%;
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
-            margin: 15px 0;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
         }
 
-        /* Contenedor del botón travieso */
-        #area-boton {
-            position: relative;
-            height: 100px;
+        /* Área dedicada al botón para que no se pierda */
+        #zona-segura-boton {
+            width: 100%;
+            height: 150px; /* Espacio garantizado */
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-top: 20px;
+            position: relative;
         }
 
         #boton-asistir {
-            z-index: 9999;
-            touch-action: none; /* Importante para móviles */
+            z-index: 999;
+            touch-action: none;
+            position: relative; /* Empieza estando ahí siempre */
         }
-
-        h1 { color: var(--dorado); margin: 0 0 10px 0; font-size: 1.8rem; }
-        p { margin-bottom: 20px; font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div id="contenedor-principal">
     <div id="pantalla-nombre">
-        <h1>¡Hola!</h1>
-        <p>Escribe tu nombre para ver la invitación:</p>
-        <input type="text" id="input-nombre" placeholder="Tu nombre aquí..." autocomplete="off">
+        <h1 style="color: var(--dorado)">¡Hola!</h1>
+        <p>Escribe tu nombre para entrar:</p>
+        <input type="text" id="input-nombre" placeholder="Tu nombre..." autocomplete="off">
         <br>
-        <button class="btn-dorado" onclick="mostrarInvitacion()">Entrar</button>
+        <button class="btn" onclick="iniciar()">Entrar</button>
     </div>
 
     <div id="pantalla-invitacion">
-        <h1 id="saludo-personalizado"></h1>
-        <p>¡Tengo el gusto de invitarte a mi grado!</p>
-        
-        <img src="invitacion.png" alt="Invitación de Grado" class="img-invitacion">
+        <h2 id="saludo" style="color: var(--dorado); margin: 0;"></h2>
+        <img src="invitacion.png" alt="Invitación" class="img-invitacion">
 
-        <div id="area-boton">
-            <button id="boton-asistir" 
-                    class="btn-dorado" 
-                    onmouseover="moverBoton()" 
-                    ontouchstart="moverBoton()" 
-                    onclick="confirmarAsistencia()">
+        <div id="zona-segura-boton">
+            <button id="boton-asistir" class="btn" 
+                    onmouseover="escapar()" 
+                    ontouchstart="escapar(event)" 
+                    onclick="finalizar()">
                 ¡Asistiré!
             </button>
         </div>
@@ -122,47 +94,41 @@
 </div>
 
 <script>
-    let intentos = 0;
-    const maxIntentos = 3;
+    let clicks = 0;
 
-    function mostrarInvitacion() {
+    function iniciar() {
         const nombre = document.getElementById('input-nombre').value;
-        if (nombre.trim() === "") {
-            alert("¡Escribe tu nombre por favor!");
-            return;
-        }
+        if(nombre.trim() === "") return alert("Pon tu nombre");
         document.getElementById('pantalla-nombre').style.display = 'none';
         document.getElementById('pantalla-invitacion').style.display = 'block';
-        document.getElementById('saludo-personalizado').innerText = `¡Hola, ${nombre}!`;
+        document.getElementById('saludo').innerText = "¡Hola, " + nombre + "!";
     }
 
-    function moverBoton() {
-        if (intentos < maxIntentos) {
+    function escapar(event) {
+        if (clicks < 3) {
+            // Si es táctil, evitamos que el click ocurra de inmediato
+            if(event) event.preventDefault();
+
             const btn = document.getElementById('boton-asistir');
             
-            // Calculamos espacio disponible en la pantalla
-            const anchoVentana = window.innerWidth;
-            const altoVentana = window.innerHeight;
+            // Calculamos posiciones dentro de la pantalla visible actual
+            const maxX = window.innerWidth - btn.offsetWidth - 20;
+            const maxY = window.innerHeight - btn.offsetHeight - 20;
 
-            // Margen de seguridad para que no se salga de los bordes (80px)
-            const margen = 80;
-            
-            const nuevoX = Math.random() * (anchoVentana - btn.offsetWidth - margen) + (margen/2);
-            const nuevoY = Math.random() * (altoVentana - btn.offsetHeight - margen) + (margen/2);
+            const x = Math.max(10, Math.random() * maxX);
+            const y = Math.max(10, Math.random() * maxY);
 
             btn.style.position = 'fixed';
-            btn.style.left = nuevoX + 'px';
-            btn.style.top = nuevoY + 'px';
-            btn.style.margin = '0';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
             
-            intentos++;
+            clicks++;
         }
     }
 
-    function confirmarAsistencia() {
-        if (intentos >= maxIntentos) {
-            alert("¡Tienes ganas de venir! 😂 Gracias por confirmar, ¡te espero!");
-            // Regresamos el botón a su lugar original si quieres
+    function finalizar() {
+        if (clicks >= 3) {
+            alert("¡Tienes ganas de venir! 😂 Gracias por confirmar, te espero.");
             const btn = document.getElementById('boton-asistir');
             btn.style.position = 'relative';
             btn.style.left = '0';
