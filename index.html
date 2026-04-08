@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitación de Grado - Alejandro</title>
+    <style>
+        :root {
+            --dorado: #d4af37;
+            --negro: #1a1a1a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--negro);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Evita que aparezcan barras de scroll cuando el botón salta */
+        }
+
+        #contenedor-principal {
+            text-align: center;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            z-index: 1;
+        }
+
+        /* Pantalla de Inicio */
+        #pantalla-nombre input {
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--dorado);
+            background: #333;
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            width: 80%;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 30px;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--dorado);
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Pantalla de Invitación */
+        #pantalla-invitacion {
+            display: none;
+        }
+
+        .img-invitacion {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+            margin: 20px 0;
+        }
+
+        #boton-asistir {
+            position: relative;
+            transition: all 0.1s ease;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        h1 { color: var(--dorado); margin-bottom: 10px; }
+        p { font-size: 1.1rem; opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div id="contenedor-principal">
+    <div id="pantalla-nombre">
+        <h1>¡Hola!</h1>
+        <p>Por favor, dinos tu nombre para continuar:</p>
+        <input type="text" id="input-nombre" placeholder="Escribe tu nombre..." autocomplete="off">
+        <br>
+        <button onclick="mostrarInvitacion()">Entrar</button>
+    </div>
+
+    <div id="pantalla-invitacion">
+        <h1 id="saludo-personalizado"></h1>
+        <p>Estás cordialmente invitado a mi grado.</p>
+        
+        <img src="invitacion.png" alt="Invitación de Grado" class="img-invitacion">
+
+        <div id="area-boton" style="height: 80px; margin-top: 20px;">
+            <button id="boton-asistir" 
+                    onmouseover="moverBoton()" 
+                    ontouchstart="moverBoton()" 
+                    onclick="confirmarAsistencia()">
+                ¡Asistiré!
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let intentos = 0;
+    const maxIntentos = 3;
+
+    function mostrarInvitacion() {
+        const nombre = document.getElementById('input-nombre').value;
+        if (nombre.trim() === "") {
+            alert("¡Por favor, dinos quién eres!");
+            return;
+        }
+        document.getElementById('pantalla-nombre').style.display = 'none';
+        document.getElementById('pantalla-invitacion').style.display = 'block';
+        document.getElementById('saludo-personalizado').innerText = `¡Hola, ${nombre}!`;
+    }
+
+    function moverBoton() {
+        if (intentos < maxIntentos) {
+            const btn = document.getElementById('boton-asistir');
+            
+            // Calculamos límites para que el botón no se salga de la pantalla visible
+            const padding = 20;
+            const anchoMax = window.innerWidth - btn.clientWidth - padding;
+            const altoMax = window.innerHeight - btn.clientHeight - padding;
+
+            // Generar posición aleatoria
+            const nuevoX = Math.floor(Math.random() * anchoMax);
+            const nuevoY = Math.floor(Math.random() * altoMax);
+
+            btn.style.position = 'fixed';
+            btn.style.left = nuevoX + 'px';
+            btn.style.top = nuevoY + 'px';
+            
+            intentos++;
+        }
+    }
+
+    function confirmarAsistencia() {
+        // Solo permite el clic real después de los 3 intentos de broma
+        if (intentos >= maxIntentos) {
+            alert("¡Tienes ganas de venir! 😂 Gracias por confirmar, ¡allá nos vemos!");
+            
+            // Opcional: Redirigir a WhatsApp
+            // window.location.href = "https://wa.me/tu_numero_aqui?text=Hola+Alejandro,+confirmó+mi+asistencia";
+        }
+    }
+</script>
+
+</body>
+</html>
