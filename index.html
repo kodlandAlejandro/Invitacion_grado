@@ -3,40 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Invitación Alejandro</title>
+    <title>Invitación - Alejandro</title>
     <style>
-        :root { --dorado: #d4af37; --negro: #1a1a1a; }
+        :root {
+            --dorado: #d4af37;
+            --negro: #1a1a1a;
+        }
+
         * { box-sizing: border-box; }
-        
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
+
+        body {
+            margin: 0;
+            padding: 0;
             background-color: var(--negro);
             color: white;
-            font-family: sans-serif;
-            overflow-x: hidden; /* Permite scroll vertical si la imagen es grande */
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            /* Eliminamos el overflow hidden para permitir scroll si la imagen es grande */
+            overflow-y: auto; 
         }
 
         #contenedor-principal {
             width: 100%;
-            max-width: 400px;
-            margin: auto;
+            max-width: 450px;
             text-align: center;
             padding: 20px;
         }
 
         input {
-            width: 80%; padding: 15px; margin-bottom: 20px;
-            border-radius: 8px; border: 2px solid var(--dorado);
-            background: #222; color: white; font-size: 16px;
+            width: 90%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: 2px solid var(--dorado);
+            background: #2a2a2a;
+            color: white;
+            font-size: 16px;
+            text-align: center;
         }
 
         .btn {
-            background-color: var(--dorado); color: black;
-            border: none; padding: 15px 30px;
-            font-weight: bold; border-radius: 8px;
-            font-size: 18px; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            background-color: var(--dorado);
+            color: black;
+            border: none;
+            padding: 15px 40px;
+            font-weight: bold;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             display: inline-block;
         }
 
@@ -44,26 +61,23 @@
 
         .img-invitacion {
             width: 100%;
-            border-radius: 12px;
-            margin-top: 10px;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            /* Ajustamos altura máxima para que no empuje tanto el botón */
+            max-height: 70vh; 
+            object-fit: contain;
+            border-radius: 15px;
+            margin: 15px 0;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
         }
 
-        /* Área dedicada al botón para que no se pierda */
-        #zona-segura-boton {
-            width: 100%;
-            height: 150px; /* Espacio garantizado */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
+        #area-boton {
+            padding: 20px 0 50px 0; /* Espacio extra abajo para que sea fácil de tocar */
+            min-height: 120px;
             position: relative;
         }
 
         #boton-asistir {
-            z-index: 999;
+            z-index: 9999;
             touch-action: none;
-            position: relative; /* Empieza estando ahí siempre */
         }
     </style>
 </head>
@@ -71,18 +85,20 @@
 
 <div id="contenedor-principal">
     <div id="pantalla-nombre">
-        <h1 style="color: var(--dorado)">¡Hola!</h1>
-        <p>Escribe tu nombre para entrar:</p>
+        <h1 style="color: var(--dorado); margin-top: 50px;">¡Hola!</h1>
+        <p>Escribe tu nombre para continuar:</p>
         <input type="text" id="input-nombre" placeholder="Tu nombre..." autocomplete="off">
         <br>
         <button class="btn" onclick="iniciar()">Entrar</button>
     </div>
 
     <div id="pantalla-invitacion">
-        <h2 id="saludo" style="color: var(--dorado); margin: 0;"></h2>
+        <h2 id="saludo" style="color: var(--dorado); margin-bottom: 5px;"></h2>
+        <p style="margin-top: 0;">Estás invitado a mi grado</p>
+        
         <img src="invitacion.png" alt="Invitación" class="img-invitacion">
 
-        <div id="zona-segura-boton">
+        <div id="area-boton">
             <button id="boton-asistir" class="btn" 
                     onmouseover="escapar()" 
                     ontouchstart="escapar(event)" 
@@ -94,41 +110,40 @@
 </div>
 
 <script>
-    let clicks = 0;
+    let bromaRealizada = 0;
+    const limiteBroma = 3;
 
     function iniciar() {
         const nombre = document.getElementById('input-nombre').value;
-        if(nombre.trim() === "") return alert("Pon tu nombre");
+        if(nombre.trim() === "") return alert("Por favor escribe tu nombre");
+        
         document.getElementById('pantalla-nombre').style.display = 'none';
         document.getElementById('pantalla-invitacion').style.display = 'block';
         document.getElementById('saludo').innerText = "¡Hola, " + nombre + "!";
     }
 
-    function escapar(event) {
-        if (clicks < 3) {
-            // Si es táctil, evitamos que el click ocurra de inmediato
-            if(event) event.preventDefault();
+    function escapar(e) {
+        if (bromaRealizada < limiteBroma) {
+            // Si es evento táctil, prevenimos el click accidental
+            if(e && e.type === 'touchstart') e.preventDefault();
 
             const btn = document.getElementById('boton-asistir');
             
-            // Calculamos posiciones dentro de la pantalla visible actual
-            const maxX = window.innerWidth - btn.offsetWidth - 20;
-            const maxY = window.innerHeight - btn.offsetHeight - 20;
-
-            const x = Math.max(10, Math.random() * maxX);
-            const y = Math.max(10, Math.random() * maxY);
+            // Calculamos posiciones aleatorias dentro de la pantalla visible
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 40) + 20;
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 40) + 20;
 
             btn.style.position = 'fixed';
             btn.style.left = x + 'px';
             btn.style.top = y + 'px';
             
-            clicks++;
+            bromaRealizada++;
         }
     }
 
     function finalizar() {
-        if (clicks >= 3) {
-            alert("¡Tienes ganas de venir! 😂 Gracias por confirmar, te espero.");
+        if (bromaRealizada >= limiteBroma) {
+            alert("¡Tienes ganas de venir! 😂 Gracias por confirmar, ¡te espero!");
             const btn = document.getElementById('boton-asistir');
             btn.style.position = 'relative';
             btn.style.left = '0';
